@@ -1,12 +1,18 @@
 import { useState } from "react";
 
-function SearchBar() {
+function SearchBar({ onSearch }) {
   const [search, setSearch] = useState("");
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    console.log("Recherche :", search);
+    const value = search.trim();
+
+    if (value.length < 2) {
+      return;
+    }
+
+    onSearch(value);
   }
 
   return (
