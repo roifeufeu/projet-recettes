@@ -1,4 +1,5 @@
 import Header from "../components/Header"
+import SearchBar from "../components/SearchBar"
 
 function Home() {
   return (
@@ -12,6 +13,8 @@ function Home() {
           Entrez le nom d'un plat pour découvrir ses ingrédients
           et les quantités nécessaires.
         </p>
+
+        <SearchBar />
       </main>
     </>
   )
