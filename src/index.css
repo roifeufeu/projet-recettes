@@ -218,9 +218,9 @@ main {
 }
 .results h2 {
   margin-top: 0;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 
-  font-size: 1.6rem;
+  font-size: 1rem;
   color: #111827;
 }
 

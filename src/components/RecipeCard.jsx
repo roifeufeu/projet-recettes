@@ -7,7 +7,7 @@ function RecipeCard({ name, image }) {
         <h2>{name}</h2>
 
         <span className="recipe-link">
-          Détails → 
+          Détails →
         </span>
       </div>
     </article>

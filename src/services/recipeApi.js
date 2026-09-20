@@ -2,9 +2,9 @@ const API_KEY = import.meta.env.VITE_SPOONACULAR_API_KEY;
 
 const BASE_URL = "https://api.spoonacular.com";
 
-export async function searchRecipes(query) {
+export async function searchRecipes(query, offset = 0) {
   const response = await fetch(
-    `${BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(query)}&number=9&apiKey=${API_KEY}`,
+    `${BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(query)}&number=9&offset=${offset}&apiKey=${API_KEY}`,
   );
 
   if (!response.ok) {
@@ -13,5 +13,5 @@ export async function searchRecipes(query) {
 
   const data = await response.json();
 
-  return data.results;
+  return data;
 }
