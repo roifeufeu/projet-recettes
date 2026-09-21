@@ -14,7 +14,7 @@ function Recipe() {
     async function loadRecipe() {
       try {
         const data = await getRecipeById(id)
-
+        console.log("Recette récupérée :", data)
         setRecipe(data)
       } catch (error) {
         console.error(error)
@@ -40,7 +40,7 @@ function Recipe() {
   }
 
   return (
-    <main className="recipe-page">
+    <main>
       <h1>{recipe.title}</h1>
 
       <img
@@ -48,21 +48,17 @@ function Recipe() {
         alt={recipe.title}
       />
 
-      <p>
-        Portions : {recipe.servings}
-      </p>
+      <p>Portions : {recipe.servings}</p>
 
-      <section>
-        <h2>Ingrédients</h2>
+      <h2>Ingrédients</h2>
 
-        <ul>
-          {recipe.extendedIngredients.map((ingredient) => (
-            <li key={ingredient.id}>
-              {ingredient.original}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ul>
+        {recipe.extendedIngredients.map((ingredient) => (
+          <li key={`${ingredient.id}-${ingredient.original}`}>
+            {ingredient.original}
+          </li>
+        ))}
+      </ul>
     </main>
   )
 }
