@@ -1,7 +1,34 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
+import Header from "../components/Header"
 import { getRecipeById } from "../services/recipeApi"
+
+function formatAmount(amount) {
+  if (amount >= 100) {
+    return Math.round(amount)
+  }
+
+  if (Number.isInteger(amount)) {
+    return amount
+  }
+
+  return Math.round(amount * 10) / 10
+}
+
+function formatUnit(unit) {
+  const units = {
+    tsp: "cuillere à café",
+    tbsp: "cuillere à soupe",
+    cup: "tasse",
+    cups: "tasses",
+    large: "grande",
+    small: "petite",
+    medium: "moyenne",
+  }
+
+  return units[unit] || unit
+}
 
 function Recipe() {
   const { id } = useParams()
@@ -14,7 +41,7 @@ function Recipe() {
     async function loadRecipe() {
       try {
         const data = await getRecipeById(id)
-        console.log("Recette récupérée :", data)
+
         setRecipe(data)
       } catch (error) {
         console.error(error)
@@ -40,26 +67,69 @@ function Recipe() {
   }
 
   return (
-    <main>
-      <h1>{recipe.title}</h1>
+    <>
+      <Header />
 
-      <img
-        src={recipe.image}
-        alt={recipe.title}
-      />
+      <main className="recipe-page">
+        <section className="recipe-header">
+          <img
+            className="recipe-image"
+            src={recipe.image}
+            alt={recipe.title}
+          />
 
-      <p>Portions : {recipe.servings}</p>
+          <div className="recipe-summary">
+            <h1>{recipe.title}</h1>
 
-      <h2>Ingrédients</h2>
+            <p>
+              <strong>Portions :</strong> {recipe.servings}
+            </p>
 
-      <ul>
-        {recipe.extendedIngredients.map((ingredient) => (
-          <li key={`${ingredient.id}-${ingredient.original}`}>
-            {ingredient.original}
-          </li>
-        ))}
-      </ul>
-    </main>
+            {recipe.readyInMinutes && (
+              <p>
+                <strong>Temps :</strong> {recipe.readyInMinutes} min
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="recipe-section">
+          <h2>Ingrédients</h2>
+
+          <ul className="ingredients-list">
+            {recipe.extendedIngredients.map((ingredient, index) => {
+              const metric = ingredient.measures?.metric
+
+              return (
+                <li key={`${ingredient.id}-${index}`}>
+                  <strong>{ingredient.name}</strong>
+
+                  {metric && (
+                    <>
+                      {" — "}
+                      {formatAmount(metric.amount)} {formatUnit(metric.unitShort)}
+                    </>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+
+        {recipe.instructions && (
+          <section className="recipe-section">
+            <h2>Instructions</h2>
+
+            <div
+              className="recipe-instructions"
+              dangerouslySetInnerHTML={{
+                __html: recipe.instructions,
+              }}
+            />
+          </section>
+        )}
+      </main>
+    </>
   )
 }
 
