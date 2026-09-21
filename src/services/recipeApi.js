@@ -4,7 +4,7 @@ const BASE_URL = "https://api.spoonacular.com";
 
 export async function searchRecipes(query, offset = 0) {
   const response = await fetch(
-    `${BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(query)}&number=9&offset=${offset}&apiKey=${API_KEY}`,
+    `${BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(query)}&number=9&offset=${offset}&sort=popularity&sortDirection=desc&apiKey=${API_KEY}`,
   );
 
   if (!response.ok) {
