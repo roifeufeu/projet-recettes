@@ -1,70 +1,90 @@
-import { useState } from "react"
+import { useState } from "react";
 
-import Header from "../components/Header"
-import SearchBar from "../components/SearchBar"
-import RecipeCard from "../components/RecipeCard"
+import Header from "../components/Header";
+import SearchBar from "../components/SearchBar";
+import RecipeCard from "../components/RecipeCard";
 
-import { searchRecipes } from "../services/recipeApi"
+import { searchRecipes } from "../services/recipeApi";
 
 function Home() {
-  const [search, setSearch] = useState("")
-  const [recipes, setRecipes] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [offset, setOffset] = useState(0)
-  const [totalResults, setTotalResults] = useState(0)
+  const [search, setSearch] = useState("");
+  const [recipes, setRecipes] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(9);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [totalResults, setTotalResults] = useState(0);
 
   async function handleSearch(query) {
-    setSearch(query)
-    setLoading(true)
-    setError("")
-    setOffset(0)
+    setSearch(query);
+    setLoading(true);
+    setError("");
+
+    setRecipes([]);
+    setVisibleCount(9);
+    setTotalResults(0);
 
     try {
-      const data = await searchRecipes(query, 0)
+      const data = await searchRecipes(query, 0);
 
-      setRecipes(data.results)
-      setTotalResults(data.totalResults)
+      setRecipes(data.results);
+      setTotalResults(data.totalResults);
     } catch (error) {
-      console.error(error)
+      console.error(error);
 
-      setError("Impossible de récupérer les recettes.")
-      setRecipes([])
-      setTotalResults(0)
+      setError("Impossible de récupérer les recettes.");
+      setRecipes([]);
+      setTotalResults(0);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-async function handleLoadMore() {
-  const newOffset = offset + 9
+  async function handleLoadMore() {
+    // Il reste déjà des recettes chargées en mémoire :
+    // aucune requête API nécessaire.
+    if (visibleCount < recipes.length) {
+      setVisibleCount((current) => Math.min(current + 9, recipes.length));
 
-  console.log("Voir plus cliqué")
-  console.log("Recherche :", search)
-  console.log("Nouvel offset :", newOffset)
+      return;
+    }
 
-  setLoading(true)
-  setError("")
+    // Toutes les recettes récupérées sont déjà affichées
+    // et il n'existe rien d'autre côté Spoonacular.
+    if (recipes.length >= totalResults) {
+      return;
+    }
 
-  try {
-    const data = await searchRecipes(search, newOffset)
+    // Il faut récupérer le prochain lot de 27 recettes.
+    setLoading(true);
+    setError("");
 
-    console.log("Réponse Spoonacular :", data)
-    console.log("Nouveaux résultats :", data.results)
+    try {
+      const data = await searchRecipes(search, recipes.length);
 
-    setRecipes((currentRecipes) => [
-      ...currentRecipes,
-      ...data.results,
-    ])
+      if (data.results.length === 0) {
+        setTotalResults(recipes.length);
+        return;
+      }
 
-    setOffset(newOffset)
-  } catch (error) {
-    console.error(error)
-    setError("Impossible de charger plus de recettes.")
-  } finally {
-    setLoading(false)
+      setRecipes((currentRecipes) => [...currentRecipes, ...data.results]);
+
+      // On n'affiche que 9 recettes du nouveau lot.
+      setVisibleCount((current) => current + 9);
+    } catch (error) {
+      console.error(error);
+
+      setError("Impossible de charger plus de recettes.");
+    } finally {
+      setLoading(false);
+    }
   }
-}
+
+  const visibleRecipes = recipes.slice(0, visibleCount);
+
+  const hasMoreRecipes =
+    visibleCount < recipes.length || recipes.length < totalResults;
+
   return (
     <>
       <Header />
@@ -74,8 +94,8 @@ async function handleLoadMore() {
           <h1>Trouvez la recette qu'il vous faut</h1>
 
           <p>
-            Entrez le nom d'un plat pour découvrir ses ingrédients
-            et les quantités nécessaires.
+            Entrez le nom d'un plat pour découvrir ses ingrédients et les
+            quantités nécessaires.
           </p>
 
           <SearchBar onSearch={handleSearch} />
@@ -84,30 +104,28 @@ async function handleLoadMore() {
         {search && (
           <section className="results">
             <h2>
-  Résultats pour "{search}" ({totalResults})
-</h2>
+              Résultats pour "{search}"{" "}
+              <span className="result-count">({totalResults})</span>
+            </h2>
 
-            {loading && recipes.length === 0 && (
-              <p>Recherche en cours...</p>
-            )}
+            {loading && recipes.length === 0 && <p>Recherche en cours...</p>}
 
-            {error && (
-              <p>{error}</p>
-            )}
+            {error && <p>{error}</p>}
 
             {!error && recipes.length > 0 && (
               <>
                 <div className="results-grid">
-                  {recipes.map((recipe) => (
+                  {visibleRecipes.map((recipe) => (
                     <RecipeCard
                       key={recipe.id}
+                      id={recipe.id}
                       name={recipe.title}
                       image={recipe.image}
                     />
                   ))}
                 </div>
 
-                {recipes.length < totalResults && (
+                {hasMoreRecipes && (
                   <button
                     className="load-more"
                     onClick={handleLoadMore}
@@ -126,7 +144,7 @@ async function handleLoadMore() {
         )}
       </main>
     </>
-  )
+  );
 }
 
-export default Home
+export default Home;

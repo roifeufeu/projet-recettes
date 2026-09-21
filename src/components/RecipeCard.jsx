@@ -1,6 +1,11 @@
-function RecipeCard({ name, image }) {
+import { Link } from "react-router-dom"
+
+function RecipeCard({ id, name, image }) {
   return (
-    <article className="recipe-card" tabIndex="0">
+    <Link
+      to={`/recipe/${id}`}
+      className="recipe-card"
+    >
       <img src={image} alt={name} />
 
       <div className="recipe-card-content">
@@ -10,7 +15,7 @@ function RecipeCard({ name, image }) {
           Détails →
         </span>
       </div>
-    </article>
+    </Link>
   )
 }
 
