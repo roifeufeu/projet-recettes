@@ -18,8 +18,10 @@ function formatAmount(amount) {
 
 function formatUnit(unit) {
   const units = {
-    tsp: "cuillere à café",
-    tbsp: "cuillere à soupe",
+    tsp: "cuillère à café",
+tsps: "cuillères à café",
+tbsp: "cuillère à soupe",
+tbsps: "cuillères à soupe",
     cup: "tasse",
     cups: "tasses",
     large: "grande",

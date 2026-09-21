@@ -35,8 +35,9 @@ body {
   font-size: 1.3rem;
   font-weight: 700;
   color: #ea580c;
-}
 
+  text-decoration: none;
+}
 .nav {
   display: flex;
   align-items: center;
