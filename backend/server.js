@@ -111,31 +111,6 @@ app.get("/api/recipes/search", async (req, res) => {
   }
 });
 
-app.get("/api/translate", async (req, res) => {
-  const text = req.query.text;
-
-  if (!text) {
-    return res.status(400).json({
-      error: "Le paramètre text est obligatoire.",
-    });
-  }
-
-  try {
-    const translatedText = await translateText(text, "fr", "en");
-
-    res.json({
-      original: text,
-      translated: translatedText,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Impossible de traduire le texte.",
-    });
-  }
-});
-
 app.get("/api/recipes/:id", async (req, res) => {
   const id = req.params.id;
 
@@ -145,6 +120,16 @@ app.get("/api/recipes/:id", async (req, res) => {
     );
 
     if (!response.ok) {
+      if (response.status === 402) {
+        return res.status(503).json({
+          error: "Quota Spoonacular atteint. Réessaie plus tard.",
+        });
+      }
+
+      const errorText = await response.text();
+
+      console.error("Erreur Spoonacular :", errorText);
+
       throw new Error("Erreur Spoonacular");
     }
 
