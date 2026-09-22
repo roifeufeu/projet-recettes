@@ -18,7 +18,7 @@ export async function searchRecipes(query, offset = 0) {
 
 export async function getRecipeById(id) {
   const response = await fetch(
-    `${BASE_URL}/recipes/${id}/information?apiKey=${API_KEY}`,
+    `${BASE_URL}/recipes/${id}/information?includeNutrition=true&apiKey=${API_KEY}`,
   );
 
   if (!response.ok) {

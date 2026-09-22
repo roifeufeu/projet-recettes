@@ -118,18 +118,35 @@ function Recipe() {
           </ul>
         </section>
 
-        {recipe.instructions && (
-          <section className="recipe-section">
-            <h2>Instructions</h2>
+        {recipe.nutrition?.nutrients && (
+  <section className="recipe-section">
+    <h2>Nutrition</h2>
 
-            <div
-              className="recipe-instructions"
-              dangerouslySetInnerHTML={{
-                __html: recipe.instructions,
-              }}
-            />
-          </section>
-        )}
+    <div className="nutrition-grid">
+      {recipe.nutrition.nutrients
+        .filter((nutrient) =>
+          [
+            "Calories",
+            "Protein",
+            "Fat",
+            "Carbohydrates",
+            "Sugar",
+            "Fiber",
+            "Sodium",
+          ].includes(nutrient.name)
+        )
+        .map((nutrient) => (
+          <div className="nutrition-item" key={nutrient.name}>
+            <strong>{nutrient.name}</strong>
+
+            <span>
+              {Math.round(nutrient.amount)} {nutrient.unit}
+            </span>
+          </div>
+        ))}
+    </div>
+  </section>
+)}
       </main>
     </>
   )
