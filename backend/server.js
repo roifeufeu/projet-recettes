@@ -11,7 +11,39 @@ app.use(cors());
 app.use(express.json());
 
 const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
+const GOOGLE_TRANSLATE_API_KEY = process.env.GOOGLE_TRANSLATE_API_KEY;
+
 const SPOONACULAR_BASE_URL = "https://api.spoonacular.com";
+const GOOGLE_TRANSLATE_URL =
+  "https://translation.googleapis.com/language/translate/v2";
+
+async function translateText(text, source, target) {
+  const response = await fetch(GOOGLE_TRANSLATE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-goog-api-key": GOOGLE_TRANSLATE_API_KEY,
+    },
+    body: JSON.stringify({
+      q: text,
+      source,
+      target,
+      format: "text",
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    console.error("Erreur Google Translation :", errorData);
+
+    throw new Error("Erreur Google Translation");
+  }
+
+  const data = await response.json();
+
+  return data.data.translations[0].translatedText;
+}
 
 app.get("/api/test", (req, res) => {
   res.json({
@@ -30,11 +62,31 @@ app.get("/api/recipes/search", async (req, res) => {
   }
 
   try {
+    console.log("Recherche reçue :", query);
+
+    const translatedQuery = await translateText(query, "fr", "en");
+
+    console.log("Recherche traduite :", translatedQuery);
+
     const response = await fetch(
-      `${SPOONACULAR_BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(query)}&number=27&offset=${offset}&apiKey=${SPOONACULAR_API_KEY}`,
+      `${SPOONACULAR_BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(
+        translatedQuery,
+      )}&number=27&offset=${offset}&apiKey=${SPOONACULAR_API_KEY}`,
     );
 
+    console.log("Statut Spoonacular :", response.status);
+
     if (!response.ok) {
+      if (response.status === 402) {
+        return res.status(503).json({
+          error: "Quota Spoonacular atteint. Réessaie plus tard.",
+        });
+      }
+
+      const errorText = await response.text();
+
+      console.error("Erreur Spoonacular :", errorText);
+
       throw new Error("Erreur Spoonacular");
     }
 
@@ -51,7 +103,7 @@ app.get("/api/recipes/search", async (req, res) => {
       totalResults: data.totalResults,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Erreur recherche :", error);
 
     res.status(500).json({
       error: "Impossible de récupérer les recettes.",
@@ -59,8 +111,29 @@ app.get("/api/recipes/search", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Serveur lancé sur http://localhost:${PORT}`);
+app.get("/api/translate", async (req, res) => {
+  const text = req.query.text;
+
+  if (!text) {
+    return res.status(400).json({
+      error: "Le paramètre text est obligatoire.",
+    });
+  }
+
+  try {
+    const translatedText = await translateText(text, "fr", "en");
+
+    res.json({
+      original: text,
+      translated: translatedText,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Impossible de traduire le texte.",
+    });
+  }
 });
 
 app.get("/api/recipes/:id", async (req, res) => {
@@ -123,4 +196,8 @@ app.get("/api/recipes/:id", async (req, res) => {
       error: "Impossible de récupérer la recette.",
     });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Serveur lancé sur http://localhost:${PORT}`);
 });
