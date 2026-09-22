@@ -99,51 +99,35 @@ function Recipe() {
           <h2>Ingrédients</h2>
 
           <ul className="ingredients-list">
-            {recipe.extendedIngredients.map((ingredient, index) => {
-              const metric = ingredient.measures?.metric
+            {recipe.ingredients.map((ingredient, index) => (
+  <li key={`${ingredient.id}-${index}`}>
+    <strong>{ingredient.name}</strong>
 
-              return (
-                <li key={`${ingredient.id}-${index}`}>
-                  <strong>{ingredient.name}</strong>
-
-                  {metric && (
-                    <>
-                      {" — "}
-                      {formatAmount(metric.amount)} {formatUnit(metric.unitShort)}
-                    </>
-                  )}
-                </li>
-              )
-            })}
+    {ingredient.amount != null && (
+      <>
+        {" — "}
+        {formatAmount(ingredient.amount)} {formatUnit(ingredient.unit)}
+      </>
+    )}
+  </li>
+))}
           </ul>
         </section>
 
-        {recipe.nutrition?.nutrients && (
+        {recipe.nutrition.length > 0 && (
   <section className="recipe-section">
     <h2>Nutrition</h2>
 
     <div className="nutrition-grid">
-      {recipe.nutrition.nutrients
-        .filter((nutrient) =>
-          [
-            "Calories",
-            "Protein",
-            "Fat",
-            "Carbohydrates",
-            "Sugar",
-            "Fiber",
-            "Sodium",
-          ].includes(nutrient.name)
-        )
-        .map((nutrient) => (
-          <div className="nutrition-item" key={nutrient.name}>
-            <strong>{nutrient.name}</strong>
+      {recipe.nutrition.map((nutrient) => (
+        <div className="nutrition-item" key={nutrient.name}>
+          <strong>{nutrient.name}</strong>
 
-            <span>
-              {Math.round(nutrient.amount)} {nutrient.unit}
-            </span>
-          </div>
-        ))}
+          <span>
+            {Math.round(nutrient.amount)} {nutrient.unit}
+          </span>
+        </div>
+      ))}
     </div>
   </section>
 )}

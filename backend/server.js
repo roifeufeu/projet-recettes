@@ -40,36 +40,21 @@ app.get("/api/recipes/search", async (req, res) => {
 
     const data = await response.json();
 
-    res.json(data);
+    const recipes = data.results.map((recipe) => ({
+      id: recipe.id,
+      title: recipe.title,
+      image: recipe.image,
+    }));
+
+    res.json({
+      results: recipes,
+      totalResults: data.totalResults,
+    });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
       error: "Impossible de récupérer les recettes.",
-    });
-  }
-});
-
-app.get("/api/recipes/:id", async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const response = await fetch(
-      `${SPOONACULAR_BASE_URL}/recipes/${id}/information?includeNutrition=true&apiKey=${SPOONACULAR_API_KEY}`,
-    );
-
-    if (!response.ok) {
-      throw new Error("Erreur Spoonacular");
-    }
-
-    const data = await response.json();
-
-    res.json(data);
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Impossible de récupérer la recette.",
     });
   }
 });
@@ -92,7 +77,45 @@ app.get("/api/recipes/:id", async (req, res) => {
 
     const data = await response.json();
 
-    res.json(data);
+    const recipe = {
+      id: data.id,
+      title: data.title,
+      image: data.image,
+      servings: data.servings,
+      readyInMinutes: data.readyInMinutes,
+
+      ingredients: data.extendedIngredients.map((ingredient) => {
+        const metric = ingredient.measures?.metric;
+
+        return {
+          id: ingredient.id,
+          name: ingredient.nameClean || ingredient.name,
+          amount: metric?.amount ?? ingredient.amount,
+          unit: metric?.unitShort || ingredient.unit || "",
+        };
+      }),
+
+      nutrition:
+        data.nutrition?.nutrients
+          ?.filter((nutrient) =>
+            [
+              "Calories",
+              "Protein",
+              "Fat",
+              "Carbohydrates",
+              "Sugar",
+              "Fiber",
+              "Sodium",
+            ].includes(nutrient.name),
+          )
+          .map((nutrient) => ({
+            name: nutrient.name,
+            amount: nutrient.amount,
+            unit: nutrient.unit,
+          })) || [],
+    };
+
+    res.json(recipe);
   } catch (error) {
     console.error(error);
 
