@@ -1,10 +1,8 @@
-const API_KEY = import.meta.env.VITE_SPOONACULAR_API_KEY;
-
-const BASE_URL = "https://api.spoonacular.com";
+const BASE_URL = "http://localhost:3000";
 
 export async function searchRecipes(query, offset = 0) {
   const response = await fetch(
-    `${BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(query)}&number=27&offset=${offset}&apiKey=${API_KEY}`,
+    `${BASE_URL}/api/recipes/search?q=${encodeURIComponent(query)}&offset=${offset}`,
   );
 
   if (!response.ok) {
@@ -17,9 +15,7 @@ export async function searchRecipes(query, offset = 0) {
 }
 
 export async function getRecipeById(id) {
-  const response = await fetch(
-    `${BASE_URL}/recipes/${id}/information?includeNutrition=true&apiKey=${API_KEY}`,
-  );
+  const response = await fetch(`${BASE_URL}/api/recipes/${id}`);
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération de la recette");
