@@ -45,6 +45,40 @@ async function translateText(text, source, target) {
   return data.data.translations[0].translatedText;
 }
 
+async function translateTexts(texts, source, target) {
+  if (texts.length === 0) {
+    return [];
+  }
+
+  const response = await fetch(GOOGLE_TRANSLATE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-goog-api-key": GOOGLE_TRANSLATE_API_KEY,
+    },
+    body: JSON.stringify({
+      q: texts,
+      source,
+      target,
+      format: "text",
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    console.error("Erreur Google Translation :", errorData);
+
+    throw new Error("Erreur Google Translation");
+  }
+
+  const data = await response.json();
+
+  return data.data.translations.map(
+    (translation) => translation.translatedText,
+  );
+}
+
 app.get("/api/test", (req, res) => {
   res.json({
     message: "Le backend fonctionne !",
@@ -62,19 +96,13 @@ app.get("/api/recipes/search", async (req, res) => {
   }
 
   try {
-    console.log("Recherche reçue :", query);
-
     const translatedQuery = await translateText(query, "fr", "en");
-
-    console.log("Recherche traduite :", translatedQuery);
 
     const response = await fetch(
       `${SPOONACULAR_BASE_URL}/recipes/complexSearch?query=${encodeURIComponent(
         translatedQuery,
       )}&number=27&offset=${offset}&apiKey=${SPOONACULAR_API_KEY}`,
     );
-
-    console.log("Statut Spoonacular :", response.status);
 
     if (!response.ok) {
       if (response.status === 402) {
@@ -92,9 +120,13 @@ app.get("/api/recipes/search", async (req, res) => {
 
     const data = await response.json();
 
-    const recipes = data.results.map((recipe) => ({
+    const titles = data.results.map((recipe) => recipe.title);
+
+    const translatedTitles = await translateTexts(titles, "en", "fr");
+
+    const recipes = data.results.map((recipe, index) => ({
       id: recipe.id,
-      title: recipe.title,
+      title: translatedTitles[index],
       image: recipe.image,
     }));
 
@@ -135,19 +167,40 @@ app.get("/api/recipes/:id", async (req, res) => {
 
     const data = await response.json();
 
+    const ingredientNames = data.extendedIngredients.map(
+      (ingredient) => ingredient.nameClean || ingredient.name,
+    );
+
+    const textsToTranslate = [data.title, ...ingredientNames];
+
+    const translatedTexts = await translateTexts(textsToTranslate, "en", "fr");
+
+    const translatedTitle = translatedTexts[0];
+    const translatedIngredients = translatedTexts.slice(1);
+
+    const nutrientTranslations = {
+      Calories: "Calories",
+      Protein: "Protéines",
+      Fat: "Lipides",
+      Carbohydrates: "Glucides",
+      Sugar: "Sucres",
+      Fiber: "Fibres",
+      Sodium: "Sodium",
+    };
+
     const recipe = {
       id: data.id,
-      title: data.title,
+      title: translatedTitle,
       image: data.image,
       servings: data.servings,
       readyInMinutes: data.readyInMinutes,
 
-      ingredients: data.extendedIngredients.map((ingredient) => {
+      ingredients: data.extendedIngredients.map((ingredient, index) => {
         const metric = ingredient.measures?.metric;
 
         return {
           id: ingredient.id,
-          name: ingredient.nameClean || ingredient.name,
+          name: translatedIngredients[index],
           amount: metric?.amount ?? ingredient.amount,
           unit: metric?.unitShort || ingredient.unit || "",
         };
@@ -167,7 +220,7 @@ app.get("/api/recipes/:id", async (req, res) => {
             ].includes(nutrient.name),
           )
           .map((nutrient) => ({
-            name: nutrient.name,
+            name: nutrientTranslations[nutrient.name],
             amount: nutrient.amount,
             unit: nutrient.unit,
           })) || [],
@@ -175,7 +228,7 @@ app.get("/api/recipes/:id", async (req, res) => {
 
     res.json(recipe);
   } catch (error) {
-    console.error(error);
+    console.error("Erreur recette :", error);
 
     res.status(500).json({
       error: "Impossible de récupérer la recette.",

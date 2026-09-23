@@ -1,71 +1,91 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import Header from "../components/Header"
-import { getRecipeById } from "../services/recipeApi"
+import Header from "../components/Header";
+import { getRecipeById } from "../services/recipeApi";
 
 function formatAmount(amount) {
   if (amount >= 100) {
-    return Math.round(amount)
+    return Math.round(amount);
   }
 
   if (Number.isInteger(amount)) {
-    return amount
+    return amount;
   }
 
-  return Math.round(amount * 10) / 10
+  return Math.round(amount * 10) / 10;
 }
 
 function formatUnit(unit) {
+  if (!unit) {
+    return "";
+  }
+
+  const normalizedUnit = unit.toLowerCase();
+
   const units = {
     tsp: "cuillère à café",
-tsps: "cuillères à café",
-tbsp: "cuillère à soupe",
-tbsps: "cuillères à soupe",
+    tsps: "cuillères à café",
+
+    tbsp: "cuillère à soupe",
+    tbsps: "cuillères à soupe",
+
     cup: "tasse",
     cups: "tasses",
+
+    serving: "portion",
+    servings: "portions",
+
+    piece: "pièce",
+    pieces: "pièces",
+
     large: "grande",
     small: "petite",
     medium: "moyenne",
-  }
 
-  return units[unit] || unit
+    g: "g",
+    kg: "kg",
+    ml: "ml",
+    l: "l",
+  };
+
+  return units[normalizedUnit] || unit;
 }
 
 function Recipe() {
-  const { id } = useParams()
+  const { id } = useParams();
 
-  const [recipe, setRecipe] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadRecipe() {
       try {
-        const data = await getRecipeById(id)
+        const data = await getRecipeById(id);
 
-        setRecipe(data)
+        setRecipe(data);
       } catch (error) {
-        console.error(error)
-        setError("Impossible de récupérer la recette.")
+        console.error(error);
+        setError("Impossible de récupérer la recette.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    loadRecipe()
-  }, [id])
+    loadRecipe();
+  }, [id]);
 
   if (loading) {
-    return <p>Chargement de la recette...</p>
+    return <p>Chargement de la recette...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>
+    return <p>{error}</p>;
   }
 
   if (!recipe) {
-    return <p>Recette introuvable.</p>
+    return <p>Recette introuvable.</p>;
   }
 
   return (
@@ -74,11 +94,7 @@ function Recipe() {
 
       <main className="recipe-page">
         <section className="recipe-header">
-          <img
-            className="recipe-image"
-            src={recipe.image}
-            alt={recipe.title}
-          />
+          <img className="recipe-image" src={recipe.image} alt={recipe.title} />
 
           <div className="recipe-summary">
             <h1>{recipe.title}</h1>
@@ -100,40 +116,41 @@ function Recipe() {
 
           <ul className="ingredients-list">
             {recipe.ingredients.map((ingredient, index) => (
-  <li key={`${ingredient.id}-${index}`}>
-    <strong>{ingredient.name}</strong>
+              <li key={`${ingredient.id}-${index}`}>
+                <strong>{ingredient.name}</strong>
 
-    {ingredient.amount != null && (
-      <>
-        {" — "}
-        {formatAmount(ingredient.amount)} {formatUnit(ingredient.unit)}
-      </>
-    )}
-  </li>
-))}
+                {ingredient.amount != null && (
+                  <>
+                    {" — "}
+                    {formatAmount(ingredient.amount)}{" "}
+                    {formatUnit(ingredient.unit)}
+                  </>
+                )}
+              </li>
+            ))}
           </ul>
         </section>
 
         {recipe.nutrition.length > 0 && (
-  <section className="recipe-section">
-    <h2>Nutrition</h2>
+          <section className="recipe-section">
+            <h2>Nutrition</h2>
 
-    <div className="nutrition-grid">
-      {recipe.nutrition.map((nutrient) => (
-        <div className="nutrition-item" key={nutrient.name}>
-          <strong>{nutrient.name}</strong>
+            <div className="nutrition-grid">
+              {recipe.nutrition.map((nutrient) => (
+                <div className="nutrition-item" key={nutrient.name}>
+                  <strong>{nutrient.name}</strong>
 
-          <span>
-            {Math.round(nutrient.amount)} {nutrient.unit}
-          </span>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+                  <span>
+                    {Math.round(nutrient.amount)} {nutrient.unit}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </>
-  )
+  );
 }
 
-export default Recipe
+export default Recipe;
