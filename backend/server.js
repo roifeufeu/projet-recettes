@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import pool from "./db.js";
 
 dotenv.config();
 
@@ -233,23 +232,6 @@ app.get("/api/recipes/:id", async (req, res) => {
 
     res.status(500).json({
       error: "Impossible de récupérer la recette.",
-    });
-  }
-});
-
-app.get("/api/db-test", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-
-    res.json({
-      message: "Connexion PostgreSQL réussie",
-      time: result.rows[0].now,
-    });
-  } catch (error) {
-    console.error("Erreur PostgreSQL :", error);
-
-    res.status(500).json({
-      error: "Connexion PostgreSQL impossible",
     });
   }
 });
