@@ -38,40 +38,6 @@ body {
 
   text-decoration: none;
 }
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.nav a {
-  text-decoration: none;
-  color: #374151;
-  font-weight: 500;
-}
-
-.nav a:hover {
-  color: #ea580c;
-}
-
-.login-button {
-  padding: 10px 18px;
-
-  border: none;
-  border-radius: 8px;
-
-  background-color: #ea580c;
-  color: white;
-
-  font-size: 0.95rem;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.login-button:hover {
-  background-color: #c2410c;
-}
 
 /* HERO */
 
@@ -431,10 +397,8 @@ main {
 
 @media (max-width: 800px) {
   .recipe-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: 48px;
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .recipe-summary h1 {
@@ -444,7 +408,26 @@ main {
   .ingredients-list {
     grid-template-columns: 1fr;
   }
+
+  .nutrition-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+
+@media (max-width: 500px) {
+  .recipe-page {
+    padding: 32px 16px 48px;
+  }
+
+  .nutrition-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-summary h1 {
+    font-size: 1.7rem;
+  }
+}
+
 .nutrition-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
