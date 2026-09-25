@@ -476,3 +476,33 @@ main {
 .install-button:hover {
   background-color: #c2410c;
 }
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  padding: 40px 20px;
+
+  color: #6b7280;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+
+  border: 4px solid #fed7aa;
+  border-top-color: #ea580c;
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

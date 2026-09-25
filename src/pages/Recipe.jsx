@@ -77,7 +77,16 @@ function Recipe() {
   }, [id]);
 
   if (loading) {
-    return <p>Chargement de la recette...</p>;
+    return (
+      <>
+        <Header />
+
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Chargement de la recette...</p>
+        </div>
+      </>
+    );
   }
 
   if (error) {

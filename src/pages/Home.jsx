@@ -108,8 +108,12 @@ function Home() {
               <span className="result-count">({totalResults})</span>
             </h2>
 
-            {loading && recipes.length === 0 && <p>Recherche en cours...</p>}
-
+            {loading && recipes.length === 0 && (
+              <div className="loading-state">
+                <div className="spinner"></div>
+                <p>Recherche des recettes...</p>
+              </div>
+            )}
             {error && <p>{error}</p>}
 
             {!error && recipes.length > 0 && (
