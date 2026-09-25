@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import RecipeCard from "../components/RecipeCard";
 
@@ -91,7 +90,7 @@ function Home() {
 
   return (
     <>
-      <Header />
+      
 
       <main>
         <section className="hero">
