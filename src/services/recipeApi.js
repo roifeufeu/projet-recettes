@@ -1,7 +1,6 @@
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function searchRecipes(query, offset = 0) {
-  console.count("searchRecipes appelé");
   const response = await fetch(
     `${BASE_URL}/api/recipes/search?q=${encodeURIComponent(query)}&offset=${offset}`,
   );
