@@ -1,16 +1,67 @@
-# React + Vite
+# Projet Recettes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application web permettant de rechercher un plat et d'obtenir rapidement
+ses ingrédients, les quantités nécessaires et des informations nutritionnelles.
 
-Currently, two official plugins are available:
+🌐 Application : https://projet-recettes.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Fonctionnalités
 
-## React Compiler
+- Recherche de recettes en français
+- Affichage de plusieurs résultats avec image
+- Page détaillée pour chaque recette
+- Liste des ingrédients et quantités
+- Informations nutritionnelles
+- Traduction automatique des recherches et des données
+- Interface responsive pour ordinateur et mobile
+- Progressive Web App (PWA)
+- Installation de l'application sur un appareil compatible
+- Gestion des états de chargement et des erreurs
+- Tests automatisés de composants React
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Technologies utilisées
 
-## Expanding the ESLint configuration
+### Frontend
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- Vite
+- React Router
+- CSS
+- Vite PWA
+- Vitest
+- React Testing Library
+
+### Backend
+
+- Node.js
+- Express
+- CORS
+- express-rate-limit
+- dotenv
+
+### APIs externes
+
+- Spoonacular API
+- Google Cloud Translation API
+
+### Déploiement
+
+- Vercel pour le frontend
+- Railway pour le backend
+
+## Architecture
+
+L'application est séparée en deux parties principales :
+
+```text
+Utilisateur
+    │
+    ▼
+React / Vite / PWA
+    │
+    ▼
+Backend Express
+    │
+    ├──────────────► Google Translation API
+    │
+    └──────────────► Spoonacular API
