@@ -66,6 +66,7 @@ function Recipe() {
         setRecipe(data);
       } catch (error) {
         console.error(error);
+
         setError(
           "La recette n'a pas pu être chargée. Vérifiez votre connexion et réessayez.",
         );
@@ -79,96 +80,93 @@ function Recipe() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Chargement de la recette...</p>
-        </div>
-      </>
+      <div className="loading-state">
+        <div className="spinner"></div>
+        <p>Chargement de la recette...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <Header />
-
-        <main className="recipe-page">
-          <div className="error-state">
-            <strong>Impossible de charger la recette</strong>
-            <p>{error}</p>
-          </div>
-        </main>
-      </>
+      <main className="recipe-page">
+        <div className="error-state">
+          <strong>Impossible de charger la recette</strong>
+          <p>{error}</p>
+        </div>
+      </main>
     );
   }
 
   if (!recipe) {
-    return <p>Recette introuvable.</p>;
+    return (
+      <main className="recipe-page">
+        <div className="error-state">
+          <strong>Recette introuvable</strong>
+          <p>Cette recette n'existe pas ou n'est plus disponible.</p>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <>
-      <main className="recipe-page">
-        <section className="recipe-header">
-          <img className="recipe-image" src={recipe.image} alt={recipe.title} />
+    <main className="recipe-page">
+      <section className="recipe-header">
+        <img className="recipe-image" src={recipe.image} alt={recipe.title} />
 
-          <div className="recipe-summary">
-            <h1>{recipe.title}</h1>
+        <div className="recipe-summary">
+          <h1>{recipe.title}</h1>
 
+          <p>
+            <strong>Portions :</strong> {recipe.servings}
+          </p>
+
+          {recipe.readyInMinutes && (
             <p>
-              <strong>Portions :</strong> {recipe.servings}
+              <strong>Temps :</strong> {recipe.readyInMinutes} min
             </p>
+          )}
+        </div>
+      </section>
 
-            {recipe.readyInMinutes && (
-              <p>
-                <strong>Temps :</strong> {recipe.readyInMinutes} min
-              </p>
-            )}
+      <section className="recipe-section">
+        <h2>Ingrédients</h2>
+
+        <ul className="ingredients-list">
+          {recipe.ingredients.map((ingredient, index) => (
+            <li key={`${ingredient.id}-${index}`}>
+              <strong>{ingredient.name}</strong>
+
+              {ingredient.amount != null && (
+                <>
+                  {" — "}
+                  {formatAmount(ingredient.amount)}{" "}
+                  {formatUnit(ingredient.unit)}
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {recipe.nutrition.length > 0 && (
+        <section className="recipe-section">
+          <h2>Nutrition</h2>
+
+          <div className="nutrition-grid">
+            {recipe.nutrition.map((nutrient) => (
+              <div className="nutrition-item" key={nutrient.name}>
+                <strong>{nutrient.name}</strong>
+
+                <span>
+                  {Math.round(nutrient.amount)} {nutrient.unit}
+                </span>
+              </div>
+            ))}
           </div>
         </section>
-
-        <section className="recipe-section">
-          <h2>Ingrédients</h2>
-
-          <ul className="ingredients-list">
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={`${ingredient.id}-${index}`}>
-                <strong>{ingredient.name}</strong>
-
-                {ingredient.amount != null && (
-                  <>
-                    {" — "}
-                    {formatAmount(ingredient.amount)}{" "}
-                    {formatUnit(ingredient.unit)}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {recipe.nutrition.length > 0 && (
-          <section className="recipe-section">
-            <h2>Nutrition</h2>
-
-            <div className="nutrition-grid">
-              {recipe.nutrition.map((nutrient) => (
-                <div className="nutrition-item" key={nutrient.name}>
-                  <strong>{nutrient.name}</strong>
-
-                  <span>
-                    {Math.round(nutrient.amount)} {nutrient.unit}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-    </>
+      )}
+    </main>
   );
 }
 
