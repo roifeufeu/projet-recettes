@@ -67,7 +67,9 @@ function Recipe() {
         setRecipe(data);
       } catch (error) {
         console.error(error);
-        setError("Impossible de récupérer la recette.");
+        setError(
+          "La recette n'a pas pu être chargée. Vérifiez votre connexion et réessayez.",
+        );
       } finally {
         setLoading(false);
       }
@@ -90,7 +92,18 @@ function Recipe() {
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <>
+        <Header />
+
+        <main className="recipe-page">
+          <div className="error-state">
+            <strong>Impossible de charger la recette</strong>
+            <p>{error}</p>
+          </div>
+        </main>
+      </>
+    );
   }
 
   if (!recipe) {

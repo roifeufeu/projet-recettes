@@ -32,7 +32,9 @@ function Home() {
     } catch (error) {
       console.error(error);
 
-      setError("Impossible de récupérer les recettes.");
+      setError(
+        "Impossible de charger davantage de recettes. Réessayez dans quelques instants.",
+      );
       setRecipes([]);
       setTotalResults(0);
     } finally {
@@ -74,7 +76,9 @@ function Home() {
     } catch (error) {
       console.error(error);
 
-      setError("Impossible de charger plus de recettes.");
+      setError(
+        "Impossible de récupérer les recettes. Vérifiez votre connexion et réessayez.",
+      );
     } finally {
       setLoading(false);
     }
@@ -114,7 +118,12 @@ function Home() {
                 <p>Recherche des recettes...</p>
               </div>
             )}
-            {error && <p>{error}</p>}
+            {error && (
+              <div className="error-state">
+                <strong>Une erreur est survenue</strong>
+                <p>{error}</p>
+              </div>
+            )}
 
             {!error && recipes.length > 0 && (
               <>
