@@ -7,32 +7,36 @@ export default defineConfig({
     react(),
 
     VitePWA({
-      registerType: "autoUpdate",
+  registerType: "autoUpdate",
 
-      manifest: {
-        name: "Projet Recettes",
-        short_name: "Recettes",
-        description:
-          "Recherchez un plat et obtenez ses ingrédients et ses quantités.",
+  workbox: {
+    cleanupOutdatedCaches: true,
+    skipWaiting: true,
+    clientsClaim: true,
+  },
 
-        theme_color: "#ea580c",
-        background_color: "#fff7ed",
+  manifest: {
+    name: "Projet Recettes",
+    short_name: "Recettes",
+    description:
+      "Recherchez un plat et obtenez ses ingrédients et ses quantités.",
 
-        display: "standalone",
+    theme_color: "#ea580c",
+    background_color: "#fff7ed",
 
-        icons: [
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-        ],
+    display: "standalone",
+
+    icons: [
+      {
+        src: "/pwa-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
       },
-    }),
-  ],
-});
+      {
+        src: "/pwa-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  },
+})
