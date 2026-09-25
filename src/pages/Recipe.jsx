@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import Header from "../components/Header";
 import { getRecipeById } from "../services/recipeApi";
 
 function formatAmount(amount) {
@@ -112,8 +111,6 @@ function Recipe() {
 
   return (
     <>
-      <Header />
-
       <main className="recipe-page">
         <section className="recipe-header">
           <img className="recipe-image" src={recipe.image} alt={recipe.title} />
